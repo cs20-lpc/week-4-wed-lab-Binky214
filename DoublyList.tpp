@@ -1,3 +1,6 @@
+// I still don't know the difference between i++ and ++i but AI seems to favor ++i over i++ so you'll see a mix and hopefully it doesn't cause issues in the code
+
+
 template <typename T>
 DoublyList<T>::DoublyList()
 : header(new Node), trailer(new Node) {
@@ -30,7 +33,23 @@ DoublyList<T>::~DoublyList() {
 
 template <typename T>
 void DoublyList<T>::append(const T& elem) {
-    // TO DO: Implement the code for the append
+    Node* newNode = new Node;
+    newNode->value = elem;
+    newNode->next = nullptr;
+    newNode->prev = nullptr;
+
+    //empty list check
+    if (header == nullptr) {
+        header = newNode;
+        trailer = newNode;
+    }
+    else {
+        newNode->prev = trailer;
+        trailer->next = newNode;
+        trailer = newNode;
+    }
+
+    this->length++;
 
 }
 
@@ -66,7 +85,19 @@ void DoublyList<T>::copy(const DoublyList<T>& copyObj) {
 
 template <typename T>
 T DoublyList<T>::getElement(int position) const {
-    // TO DO: Implent code for getElement at position
+    if (position < 0 || position >= this->length) {
+        throw std::out_of_range("Out of bounds");
+    }
+
+    Node* curr;
+
+    curr = header;
+
+    for (int i = 0; i < position; i++) {
+        curr = curr -> next;
+    }
+
+    return curr -> value;
 }
 
 template <typename T>
@@ -77,7 +108,57 @@ int DoublyList<T>::getLength() const {
 
 template <typename T>
 void DoublyList<T>::insert(int position, const T& elem) {
-  // TO DO: Implement code to insert an element to list
+
+    if (position < 0 || position > this->length) {
+        throw std::out_of_range("Index out of bounds");
+    }
+
+    Node* newNode = new Node(elem);
+
+    //if empty list
+    if (this->length == 0) {
+        header = trailer = newNode;
+    }
+
+    //insert at head
+    else if (position == 0) {
+        newNode->next = header;
+        header->prev = newNode;
+        header = newNode;
+    }
+
+    //insert at end (basically append)
+    else if (position == this->length) {
+        newNode->prev = trailer;
+        trailer->next = newNode;
+        trailer = newNode;
+    }
+    
+    //insert somewhere inside
+    else {
+        Node* curr;
+
+        //AI recommends that I put this where it chooses direction depending on if position is closer to begin/end nodes
+        if (position < this->length / 2) {
+            curr = header;
+            for (int i = 0; i < position; ++i) {
+                curr = curr->next;
+            }
+        } else {
+            curr = trailer;
+            for (int i = this->length - 1; i >= position; --i) {
+                curr = curr->prev;
+            }
+        }
+
+        newNode->prev = curr->prev;
+        newNode->next = curr;
+
+        curr->prev->next = newNode;
+        curr->prev = newNode;
+    }
+
+    this->length++;
 }
 
 template <typename T>
@@ -89,18 +170,92 @@ bool DoublyList<T>::isEmpty() const {
 
 template <typename T>
 void DoublyList<T>::remove(int position) {
-    // TO DO: Implement code to remove element at given position
+    
+    if (position < 0 || position >= this->length) {
+        throw std::out_of_range("Index out of bounds");
+    }
+
+    Node* deleteNode;
+
+    //1 element
+    if (this->length == 1) {
+        deleteNode = header;
+        header = nullptr;
+        trailer = nullptr;
+    }
+    //remove head
+    else if (position == 0) {
+        deleteNode = header;
+        header = header->next;
+        header->prev = nullptr;
+    }
+    //remove trailer
+    else if (position == this->length - 1) {
+        deleteNode = trailer;
+        trailer = trailer->prev;
+        trailer->next = nullptr;
+    }
+    //remove somewhere in middle
+    else {
+        Node* curr;
+
+        //AI recommends that I put this where it chooses direction depending on if position is closer to begin/end nodes
+        if (position < this->length / 2) {
+            curr = header;
+            for (int i = 0; i < position; ++i) {
+                curr = curr->next;
+            }
+        } else {
+            curr = trailer;
+            for (int i = this->length - 1; i > position; --i) {
+                curr = curr->prev;
+            }
+        }
+
+        deleteNode = curr;
+        curr->prev->next = curr->next;
+        curr->next->prev = curr->prev;
+    }
+
+    delete deleteNode;
+    this->length--;
 }
 
 template <typename T>
 bool DoublyList<T>::search(const T& elem) const {
-    // TO DO: Implement code to search for element
+    Node* curr = header;
+
+    while (curr != nullptr) {
+        if (curr->value == elem) {
+            return true;
+        }
+        curr = curr -> next;
+    }
     return false;
 }
 
 template <typename T>
 void DoublyList<T>::replace(int position, const T& elem) {
-    // TO DO: Add code for replace method
+    if (position < 0 || position >= this->length) {
+        throw std::out_of_range("Index out of bounds");
+    }
+
+    Node* curr;
+
+    //AI recommends that I put this where it chooses direction depending on if position is closer to begin/end nodes
+    if (position < this->length / 2) {
+        curr = header;
+        for (int i = 0; i < position; ++i) {
+            curr = curr->next;
+        }
+    } else {
+        curr = trailer;
+        for (int i = this->length - 1; i > position; --i) {
+            curr = curr->prev;
+        }
+    }
+
+    curr->value = elem;
 }
 
 template <typename T>

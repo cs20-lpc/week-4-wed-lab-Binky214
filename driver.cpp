@@ -26,4 +26,22 @@ int main()
     bool found = dlist.search(54);
     cout << found << " ";
 
+    // more stuff
+
+    cout << endl;
+
+    cout << dlist << endl;
+
+    dlist.append(1);
+    dlist.append(2);
+    dlist.append(6);
+    dlist.insert(3, 5);
+
+    cout << dlist << endl;
+
+    dlist.replace(2, 100);
+
+    cout << dlist << endl;
+
+    cout << dlist.search(54) << endl;
 }
